@@ -13,8 +13,9 @@ class ViewController: UIViewController {
     @IBOutlet var button3: UIButton!
     
     var countries = [String]()
-    var score = 0
-    var correctAnswer = 0
+    var score: Int = 0
+    var answeredQuestions: Int = 0
+    var correctAnswer: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,22 +41,38 @@ class ViewController: UIViewController {
         button3.setImage(UIImage(named: countries[2]), for: .normal)
         
         correctAnswer = Int.random(in: 0...2)
-        title = countries[correctAnswer].uppercased()
+        title = "\(countries[correctAnswer].uppercased()) (score: \(score))"
+    }
+    
+    func restartGame(action: UIAlertAction! = nil) {
+        score = 0
+        answeredQuestions = 0
+        
+        askQuestion(action: action)
     }
 
     @IBAction func buttonTapped(_ sender: UIButton) {
         var title: String
+        var ac: UIAlertController
+        
+        answeredQuestions += 1
 
         if sender.tag == correctAnswer {
             title = "Correct"
             score += 1
         } else {
-            title = "Wrong"
+            title = "Wrong! That’s the flag of \(countries[sender.tag].uppercased())"
             score -= 1
         }
         
-        let ac = UIAlertController(title: title, message: "Your score is \(score).", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
+        if answeredQuestions == 10 {
+            ac = UIAlertController(title: "All questions were answered", message: "Your final score is \(score).", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "New game", style: .default, handler: restartGame))
+        } else {
+            ac = UIAlertController(title: title, message: "Your score is \(score).", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
+        }
+        
         present(ac, animated: true)
     }
 }
